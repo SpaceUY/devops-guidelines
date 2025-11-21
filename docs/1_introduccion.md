@@ -486,7 +486,92 @@ We use Beanstalk consciously, knowing its boundaries:
 
 However, none of these limitations outweigh the benefits for our current scale and workflows.
 
-# 9. Conclusion
+# 9. When NOT to Use Elastic Beanstalk
+
+While Beanstalk is our preferred solution for most backend deployments, there are specific scenarios where alternative approaches are more appropriate:
+
+## 9.1 High-Concurrency with Serverless (Lambda)
+
+When a project requires **extremely high concurrency** with unpredictable traffic patterns, AWS Lambda with API Gateway is a better fit.
+
+**Use Lambda instead when:**
+- Traffic spikes are sudden and unpredictable
+- Request patterns are event-driven or sporadic
+- You need to scale to zero during idle periods
+- Cost optimization for low-to-medium traffic is critical
+- Request processing is stateless and short-lived
+
+**Example scenarios:**
+- Webhook handlers
+- API endpoints with burst traffic
+- Event processing pipelines
+- Real-time data transformation
+
+## 9.2 Complex Multi-EC2 Infrastructure or Multi-Tenant Deployments (SST)
+
+When a project requires **interconnected infrastructure across multiple EC2 instances** or needs **rapid deployments to multiple clients** with the same infrastructure stack, **SST (Serverless Stack)** provides better infrastructure-as-code capabilities.
+
+**Use SST instead when:**
+- You need to deploy the same infrastructure to multiple tenants/clients quickly
+- Infrastructure involves multiple interconnected EC2 instances, services, and resources
+- You require more granular control over infrastructure components
+- You need to manage complex multi-service architectures
+- Infrastructure needs to be versioned and replicated across environments easily
+
+**Example scenarios:**
+- Multi-tenant SaaS platforms
+- Complex microservices architectures with multiple services
+- Infrastructure that needs frequent replication
+- Projects requiring advanced infrastructure orchestration
+
+## 9.3 Pure Microservices Architecture
+
+When a project is designed as **pure microservices** with independent scaling, deployment, and lifecycle management, container orchestration platforms are more suitable.
+
+**Use ECS/EKS instead when:**
+- Services need completely independent scaling policies
+- Services have different resource requirements (CPU, memory)
+- Services require different deployment schedules
+- You need service mesh capabilities (Istio, App Mesh)
+- Services communicate via service discovery and internal APIs
+- You require advanced container orchestration features
+
+**Example scenarios:**
+- Large-scale distributed systems
+- Services with vastly different performance characteristics
+- Systems requiring service-to-service communication patterns
+- Projects with dedicated DevOps teams managing orchestration
+
+## 9.4 Batch/Queue-Heavy Workloads (SQS + Lambda)
+
+When a project is primarily **queue-driven** with batch processing requirements, a combination of SQS and Lambda (or Step Functions) is more efficient than maintaining always-on EC2 instances.
+
+**Use SQS + Lambda instead when:**
+- Workload is primarily asynchronous and queue-based
+- Processing can be done in small, discrete chunks
+- Jobs can be processed independently
+- You want to pay only for processing time (not idle time)
+- Processing patterns are event-driven or scheduled
+
+**Example scenarios:**
+- Image/video processing pipelines
+- Data ETL jobs
+- Email sending queues
+- Report generation systems
+- Scheduled batch operations
+
+## Decision Summary
+
+| Scenario | Recommended Solution |
+|----------|---------------------|
+| Standard Nest.js API with predictable traffic | **Elastic Beanstalk** |
+| High concurrency, unpredictable spikes | **Lambda + API Gateway** |
+| Multi-tenant, complex infrastructure | **SST** |
+| Pure microservices architecture | **ECS/EKS** |
+| Queue-heavy, batch processing | **SQS + Lambda** |
+| Multiple Nest.js apps in one deployment | **Beanstalk with Docker** |
+
+# 10. Conclusion
 
 Elastic Beanstalk (EC2 Native for single apps, Docker for multiple apps) + Amplify forms a strong, flexible, auditable, and scalable foundation for our projects.  
 
