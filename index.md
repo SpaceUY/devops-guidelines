@@ -9,7 +9,7 @@ Hey Team!
 
 Welcome to our DevOps Guidelines! 🎉
 
-![DevOps](https://media.giphy.com/media/487L0pNZKONFN01oHO/giphy.gif?cid=ecf05e479fore09w3ye09lu0j77vm5mlppw6ellqlum6amlr&ep=v1_gifs_search&rid=giphy.gif&ct=g)
+![DevOps](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6kG-ypoi78oh8ImJm7o-zhKUdPVesrBLDsQ&s)
 
 Here, you'll find everything you need to know about deploying, managing, and maintaining our infrastructure and applications. Whether you're a seasoned DevOps engineer or just getting started, these guidelines will help us all stay on the same page and ensure smooth deployments.
 
@@ -32,9 +32,6 @@ Here's a sneak peek of what we cover:
 - **Monitoring & Logging**: Tools and practices for keeping our systems healthy.
 - **Security**: Security best practices for our infrastructure and applications.
 
-## Let's Make It Happen!
-
-Remember, these guidelines are here to help us, not to restrict us. Feel free to suggest improvements or ask questions anytime. Let's work together to keep our infrastructure reliable, scalable, and fun to work with.
 
 Happy deploying! 🚀
 
