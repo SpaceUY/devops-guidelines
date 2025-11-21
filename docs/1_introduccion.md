@@ -20,8 +20,6 @@ These guidelines formalize our preferred approach:
 
 This combination gives us a modern, efficient, auditable, and secure foundation that scales with project requirements.
 
----
-
 # 1. Why We Standardize on Elastic Beanstalk (Backends)
 
 AWS Elastic Beanstalk provides a fully managed layer on top of EC2 that automatically handles:
@@ -122,55 +120,95 @@ This allows us to:
 
 If a project grows into microservices, ECS/Fargate, or EKS, the same VPC and network layout still works. Nothing is wasted.
 
----
+# 2. Elastic Beanstalk Deployment Options: EC2 Native vs Docker
 
-# 2. Our Standard: Dockerized Backends (When Needed)
+We support two deployment approaches in Elastic Beanstalk, depending on the project requirements:
 
-Although Beanstalk supports native Node.js deployments, we **standardize Docker for projects that require more than one backend per deployment** or when we need strict runtime reproducibility.
+## 2.1 EC2 Native Deployment (Standard - Single Nest.js Application)
 
-## 2.1 When we use Docker inside Beanstalk
+This is our **default and preferred approach** for most projects that deploy a single Nest.js application.
 
-- Multi-container applications  
+### When to use EC2 Native
 
-- Multiple APIs sharing 1 deployment  
+- Single Nest.js backend application
+- Standard Node.js runtime requirements
+- Simpler deployment process
+- Faster deployment times
+- Lower resource overhead
 
-- Need for OS-level dependencies (FFmpeg, Python scripts, libs, etc.)  
+### How EC2 Native works in Beanstalk
 
-- Consistency between local dev / CI / production  
+Beanstalk deploys your application directly on EC2 instances using the Node.js platform:
 
-- Preparing future migration to ECS/EKS  
+- Your source code is packaged as a ZIP file
+- Beanstalk installs Node.js and npm on the EC2 instance
+- Runs `npm install` to install dependencies
+- Starts your application using the configured start command (e.g., `npm start`)
+- Monitors application health via health check endpoints
+- Auto-restarts or replaces unhealthy instances
 
-## 2.2 How Docker works in Beanstalk
+### Deployment process
+
+1. Package your Nest.js application source code
+2. Upload ZIP to S3 as an Application Version
+3. Beanstalk extracts and installs dependencies
+4. Application runs natively on EC2
+
+This approach is simpler, faster, and requires less infrastructure overhead.
+
+## 2.2 Docker Deployment (When Multiple Nest.js Applications Are Needed)
+
+We use Docker when you need to deploy **more than one Nest.js application in the same Beanstalk environment**, or when you need strict runtime reproducibility and OS-level dependencies.
+
+### When to use Docker
+
+- **Multiple Nest.js applications** sharing the same Beanstalk deployment
+- Multiple APIs that need to run together in one environment
+- Need for OS-level dependencies (FFmpeg, Python scripts, system libraries, etc.)
+- Strict consistency between local dev / CI / production environments
+- Preparing future migration to ECS/EKS
+
+### How Docker works in Beanstalk
 
 We deploy via:
 
-- **Single-container Docker** (simple cases)
-
-- **Multi-container (docker-compose) via ECS integrated mode** (complex cases)
+- **Single-container Docker** (one Nest.js app per container)
+- **Multi-container (docker-compose) via ECS integrated mode** (multiple Nest.js apps or services)
 
 Beanstalk will:
 
-- Pull the Docker image from **Amazon ECR**
-
-- Start the container(s)
-
+- Pull the Docker image(s) from **Amazon ECR**
+- Start the container(s) on EC2 instances
 - Expose the defined ports to the ALB
-
 - Monitor container health
-
 - Auto-restart or replace unhealthy containers
 
-## 2.3 Limitations to consider
+### Deployment process
+
+1. Build Docker image(s) containing your Nest.js application(s)
+2. Push image(s) to Amazon ECR
+3. Create `Dockerrun.aws.json` file pointing to ECR image(s)
+4. Package `Dockerrun.aws.json` in a ZIP and upload to S3
+5. Beanstalk pulls image(s) from ECR and starts container(s)
+
+### Limitations to consider
 
 - Application Version bundles still require a small ZIP in S3 (even when using ECR)
-
 - EC2 instance disk size must be enough to store images (default 8–20GB can be increased)
-
 - Deployments of large images may take longer
-
 - Logs inside containers are streamed to CloudWatch but require correct config
+- More complex setup and maintenance compared to native deployments
 
----
+### Decision Matrix
+
+| Scenario | Recommended Approach |
+|----------|---------------------|
+| Single Nest.js application | **EC2 Native** |
+| Multiple Nest.js applications in one environment | **Docker (Multi-container)** |
+| Need OS-level dependencies | **Docker** |
+| Strict dev/prod consistency | **Docker** |
+| Fastest deployment times | **EC2 Native** |
+| Simpler setup | **EC2 Native** |
 
 # 3. Elastic Beanstalk Environment Types (dev / staging / prod)
 
@@ -226,15 +264,13 @@ Each environment maintains:
 
 - Independent deploy history  
 
----
-
 # 4. How Beanstalk Manages Deployments and Versions
 
 Beanstalk stores "application versions" as ZIP files in S3.  
 
 Each deploy creates a new version containing either:
 
-- Your source code (Node.js platform)  
+- Your source code (EC2 Native / Node.js platform)  
 
 - A `Dockerrun.aws.json` file pointing to ECR (Docker platform)  
 
@@ -262,11 +298,9 @@ You can:
 
 This allows us to maintain a clean and auditable release history.
 
----
-
 # 5. CI/CD Workflow for Backends (Nest.js)
 
-Below is our standardized development workflow.
+Below is our standardized development workflow for both deployment approaches.
 
 ### **Step-by-step flow**
 
@@ -292,16 +326,18 @@ Below is our standardized development workflow.
 
    - GitHub Actions pipeline triggers:
 
-     - Build Docker image  
+     **For EC2 Native deployments:**
+     - Package source code into ZIP
+     - Upload ZIP to S3
+     - Create new Beanstalk Application Version
+     - Deploy that version to **Beanstalk Dev Environment**
 
-     - Push to Amazon ECR  
-
-     - Generate ZIP with `Dockerrun.aws.json`  
-
-     - Upload ZIP to S3  
-
-     - Create new Beanstalk Application Version  
-
+     **For Docker deployments:**
+     - Build Docker image
+     - Push to Amazon ECR
+     - Generate ZIP with `Dockerrun.aws.json`
+     - Upload ZIP to S3
+     - Create new Beanstalk Application Version
      - Deploy that version to **Beanstalk Dev Environment**
 
 5. **Testing in dev environment**
@@ -326,9 +362,7 @@ Below is our standardized development workflow.
 
    - ALB handles rolling update  
 
-   - Zero downtime expected  
-
----
+   - Zero downtime expected
 
 # 6. Amplify Workflow for Frontends (React)
 
@@ -378,8 +412,6 @@ Amplify handles:
 
 This keeps frontend deployments extremely simple and safe.
 
----
-
 # 7. Our Standard AWS Architecture (Backend + Frontend)
 
 Across almost all projects we use the following architecture:
@@ -414,9 +446,13 @@ Frontend:
 
 GitHub → Amplify → S3 hosting → CloudFront CDN → HTTPS (ACM)
 
-Backend:
+Backend (EC2 Native):
 
-GitHub → Docker build → ECR → S3 (app version) → Beanstalk → ALB/ASG/EC2
+GitHub → Source code ZIP → S3 (app version) → Beanstalk → ALB/ASG/EC2 (Node.js runtime)
+
+Backend (Docker):
+
+GitHub → Docker build → ECR → S3 (app version with Dockerrun.aws.json) → Beanstalk → ALB/ASG/EC2 (Docker containers)
 
 This stack:
 
@@ -431,8 +467,6 @@ This stack:
 - Allows us to debug and tune performance easily  
 
 - Keeps infra cohesive and consistent across all teams  
-
----
 
 # 8. Limitations of Elastic Beanstalk to Be Aware Of
 
@@ -452,11 +486,9 @@ We use Beanstalk consciously, knowing its boundaries:
 
 However, none of these limitations outweigh the benefits for our current scale and workflows.
 
----
-
 # 9. Conclusion
 
-Elastic Beanstalk + Docker (when necessary) + Amplify forms a strong, flexible, auditable, and scalable foundation for our projects.  
+Elastic Beanstalk (EC2 Native for single apps, Docker for multiple apps) + Amplify forms a strong, flexible, auditable, and scalable foundation for our projects.  
 
 It enables clean DevOps workflows across environments, supports compliance needs, and provides predictable, maintainable infrastructure without unnecessary complexity.
 
