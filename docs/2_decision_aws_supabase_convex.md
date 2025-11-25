@@ -1,7 +1,7 @@
 ---
 title: Platform Decision - AWS vs Supabase vs Convex
 layout: default
-nav_order: 4
+nav_order: 2
 ---
 
 # Decision Guide: NestJS on AWS vs Convex vs Supabase
