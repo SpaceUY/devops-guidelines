@@ -20,6 +20,8 @@ These guidelines formalize our preferred approach:
 
 This combination gives us a modern, efficient, auditable, and secure foundation that scales with project requirements.
 
+For a visual walkthrough of Elastic Beanstalk, check out this tutorial: [AWS Elastic Beanstalk Tutorial](https://www.youtube.com/watch?v=wJO2xxlVIec)
+
 # 1. Why We Standardize on Elastic Beanstalk (Backends)
 
 AWS Elastic Beanstalk provides a fully managed layer on top of EC2 that automatically handles:
