@@ -1,10 +1,10 @@
 ---
-title: Introduction
+title: Introduccion Beanstalk & Amplify Standard.
 layout: default
 nav_order: 1
 ---
 
-# Introduction to DevOps Guidelines
+# Beanstalk & Amplify Deployment Standard
 
 Welcome to the DevOps Guidelines.  
 
