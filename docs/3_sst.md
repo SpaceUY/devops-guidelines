@@ -16,8 +16,6 @@ We have created a reference template with all the necessary infrastructure for c
 
 This template provides a comprehensive Infrastructure as Code (IaC) solution built with SST for deploying and managing containerized applications on AWS ECS Fargate.
 
----
-
 ## What is SST?
 
 SST (Serverless Stack) is an Infrastructure as Code framework that allows you to define and deploy AWS infrastructure using TypeScript. Unlike Terraform or CloudFormation, SST:
@@ -44,25 +42,25 @@ The template implements the following architecture:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                              AWS Cloud                                       │
-│                                                                              │
+│                              AWS Cloud                                      │
+│                                                                             │
 │  ┌──────────────────┐    ┌──────────────────┐    ┌──────────────────┐       │
-│  │   Route53 DNS    │───▶│   Application    │───▶│   ECS Fargate    │       │
+│  │   Route53 DNS    │──▶│   Application    │───▶│   ECS Fargate    │       │
 │  │                  │    │   Load Balancer  │    │   Service        │       │
 │  └──────────────────┘    └──────────────────┘    └────────┬─────────┘       │
-│                                                           │                  │
-│                          ┌────────────────────────────────┼────────────────┐│
-│                          │                                │                ││
-│                          ▼                                ▼                ││
-│                  ┌──────────────┐                 ┌──────────────┐         ││
-│                  │   RDS        │                 │   Redis      │         ││
-│                  │   PostgreSQL │                 │   ElastiCache│         ││
-│                  └──────────────┘                 └──────────────┘         ││
-│                                                                            ││
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                      ││
-│  │  CloudWatch  │  │  AWS Backup  │  │   Secrets    │                      ││
-│  │  Monitoring  │  │  Cross-Region│  │   Manager    │                      ││
-│  └──────────────┘  └──────────────┘  └──────────────┘                      ││
+│                                                           │                 │
+│                          ┌────────────────────────────────┼                 │
+│                          │                                │                 │
+│                          ▼                                ▼                 │
+│                  ┌──────────────┐                 ┌──────────────┐          │
+│                  │   RDS        │                 │   Redis      │          │
+│                  │   PostgreSQL │                 │   ElastiCache│          │
+│                  └──────────────┘                 └──────────────┘          │
+│                                                                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                       │
+│  │  CloudWatch  │  │  AWS Backup  │  │   Secrets    │                       │
+│  │  Monitoring  │  │  Cross-Region│  │   Manager    │                       │
+│  └──────────────┘  └──────────────┘  └──────────────┘                       │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
