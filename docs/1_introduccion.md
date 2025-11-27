@@ -20,7 +20,12 @@ These guidelines formalize our preferred approach:
 
 This combination gives us a modern, efficient, auditable, and secure foundation that scales with project requirements.
 
-For a visual walkthrough of Elastic Beanstalk, check out this tutorial: [AWS Elastic Beanstalk Tutorial](https://www.youtube.com/watch?v=wJO2xxlVIec)
+For a visual walkthrough of Elastic Beanstalk, check out these tutorials:
+
+1. [AWS Elastic Beanstalk - PHP Deployment](https://youtu.be/QRpLNZhz4BI?t=16) - This one deploys a PHP app but does an good job explaining the Beanstalk setup step by step.
+2. [AWS Elastic Beanstalk Tutorial](https://www.youtube.com/watch?v=wJO2xxlVIec) - Another great walkthrough with Node.js. **Note:** This tutorial uses a public database connection string, but ideally, you should configure the RDS instance within the same Beanstalk VPC using a private subnet for better security.
+
+The idea is to see that Elastic Beanstalk is not that difficult to set up, and you can adapt the process to your specific stack and requirements.
 
 # 1. Why We Standardize on Elastic Beanstalk (Backends)
 
